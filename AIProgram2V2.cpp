@@ -389,10 +389,7 @@ Schedule breedSchedules(const Schedule& parent1, const Schedule& parent2) {
 
 vector<Schedule> produceNewGeneration(vector<Schedule> parents) {
     vector<Schedule> children;
-    if (parents.size() % 2 == 0) {
-        parents.pop_back();
-    }
-    for (int i = 0; i < parents.size(); i += 2) {
+    for (int i = 0; i < parents.size()-1; i += 2) {
         children.push_back(breedSchedules(parents[i],parents[i+1]));
     }
     return children;
