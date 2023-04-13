@@ -354,15 +354,99 @@ vector<Schedule> cullHalf(vector<Schedule> population) {
 }
 
 
+//This function may need to change. It takes the entire activity from one of the parents rather than picking randomly for each activity.
+Schedule breedSchedules(const Schedule& parent1, const Schedule& parent2) {
+    // Create a new child schedule
+    Schedule child;
+
+    // Copy the activity names from one of the parents
+    for (int i = 0; i < numActivities; i++) {
+        child.activityNames[i] = parent1.activityNames[i];
+    }
+
+    // Randomly select activities from each parent
+    for (int i = 0; i < numActivities; i++) {
+        // Randomly choose which parent to take the activity from
+        if (rand() % 2 == 0) {
+            child.activities.push_back(parent1.activities[i]);
+            child.activityFacilitator[i] = parent1.activityFacilitator[i];
+            child.activityRoom[i] = parent1.activityRoom[i];
+            child.activityTime[i] = parent1.activityTime[i];
+        }
+        else {
+            child.activities.push_back(parent2.activities[i]);
+            child.activityFacilitator[i] = parent2.activityFacilitator[i];
+            child.activityRoom[i] = parent2.activityRoom[i];
+            child.activityTime[i] = parent2.activityTime[i];
+        }
+    }
+
+    // Set the score to zero
+    child.score = 0.0;
+
+    return child;
+}
+
+vector<Schedule> produceNewGeneration(vector<Schedule> parents) {
+    vector<Schedule> children;
+    if (parents.size() % 2 == 0) {
+        parents.pop_back();
+    }
+    for (int i = 0; i < parents.size(); i += 2) {
+        children.push_back(breedSchedules(parents[i],parents[i+1]));
+    }
+    return children;
+}
+
+/*
+Schedule createSchedule() {
+    int popSize = 100;
+    vector<double> scheduleScores; //initialize a vector for scores
+
+    vector<Schedule> population = initializePopulation(popSize); //generate a random population of schedules
+    for (int i = 0; i < popSize; i++) { //run the fitness function on each schedule and insert it into the scheduleScores vector
+        scheduleScores.push_back(fitnessFunction(population[i]));
+    }
+    vector<double> x = softmax(scheduleScores); //convert the scores using softmax
+    for (int i = 0; i < popSize; i++) { //set the scores of the schedule objects to the resulting softmax values
+        population.at(i).score = x.at(i);
+    }
+    vector<Schedule> y = cullHalf(population); //remove the lower half of the population based on their scores
+
+
+    vector<Schedule> z = produceNewGeneration(y); // produce a new generation z
+}
+*/
+
+
+
 //============================================= main =============================================
 
 int main()
 {
     srand(time(0));
-    int popSize = 10;
-    vector<double> scheduleScores;
+    //int popSize = 100;
+    //createSchedule();
+    int popSize = 100;
+    vector<double> scheduleScores; //initialize a vector for scores
 
-    vector<Schedule> population = initializePopulation(popSize);
+    vector<Schedule> population = initializePopulation(popSize); //generate a random population of schedules
+    for (int i = 0; i < popSize; i++) { //run the fitness function on each schedule and insert it into the scheduleScores vector
+        scheduleScores.push_back(fitnessFunction(population[i]));
+    }
+    vector<double> x = softmax(scheduleScores); //convert the scores using softmax
+    for (int i = 0; i < popSize; i++) { //set the scores of the schedule objects to the resulting softmax values
+        population.at(i).score = x.at(i);
+    }
+    vector<Schedule> y = cullHalf(population); //remove the lower half of the population based on their scores
+
+
+    //vector<Schedule> z = produceNewGeneration(y); // produce a new generation z
+
+    
+
+
+    /*
     for (int i = 0; i < popSize; i++) {
         printSchedule(population[i]);
         scheduleScores.push_back(fitnessFunction(population[i]));
@@ -371,22 +455,48 @@ int main()
         cout << "\n\n";
     
     }
+    */
     
+    /*
     cout << "\nThe softmax values for the schedules are: \n";
-    vector<double> x = softmax(scheduleScores);
-    for (int i = 0; i < popSize; i++) {
-        population.at(i).score = x.at(i);
-    }
-
 
     for (int i = 0; i < x.size(); i++) {
         cout << population.at(i).score << "\n";
     }
+    */
+    
+    //cout << "\n\nThe softmax values AFTER culling are: \n";
+    // 
+    //for (int i = 0; i < y.size(); i++) {
+    //    cout << y.at(i).score << "\n";
+    //}
 
-    cout << "\n\nThe softmax values AFTER culling are: \n";
-    vector<Schedule> y = cullHalf(population);
-    for (int i = 0; i < y.size(); i++) {
-        cout << y.at(i).score << "\n";
-    }
+    //cout << "This schedule: \n\n";
+    //printSchedule(y.at(0));
+    //cout << "Is bred with this schedule: \n\n";
+    //printSchedule(y.at(1));
+    //cout << "To produce this schedule: \n\n";
+    //printSchedule(breedSchedules(y.at(0), y.at(1)));
+    
+    //while (!scheduleScores.empty()) {
+    //    scheduleScores.pop_back();
+    //}
+
+    
+
+    //cout << "\nThe softmax values for the schedules are: \n";
+    //for (int i = 0; i < z.size(); i++) {
+    //    scheduleScores.push_back(fitnessFunction(z[i]));
+    //}
+    //
+    //vector<double> d = softmax(scheduleScores);
+    //
+    //for (int i = 0; i < popSize; i++) {
+    //    z.at(i).score = d.at(i);
+  //  }
+//
+    //for (int i = 0; i < z.size(); i++) {
+    //    cout << z.at(i).score << "\n";
+    //}
 
 }
